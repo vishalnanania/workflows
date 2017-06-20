@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     browserify = require('gulp-browserify'),
     compass = require('gulp-compass'),
-    sass = require('gulp-sass');
+    sass = require('gulp-sass'),
+    connect = require('gulp-connect');
 
 var coffeeSource = ['components/coffee/*.coffee'];
 var jsSource = ['components/scripts/*.js'];
@@ -17,16 +18,17 @@ gulp.task('log', function(){
 gulp.task('coffee', function(){
     gulp.src(coffeeSource)
         .pipe(coffee({bare: true}))
-            .on('error', gutil.log)
+        .on('error', gutil.log)
         .pipe(gulp.dest('components/scripts'))
 });
 
 gulp.task('js', function(){
     gulp.src(jsSource)
         .pipe(concat('script.js'))
-            .on('error', gutil.log)
+        .on('error', gutil.log)
         .pipe(browserify())
         .pipe(gulp.dest('builds/development/js'))
+        .pipe(connect.reload())
 });
 
 gulp.task('compass', function(){
@@ -47,6 +49,7 @@ gulp.task('sass', function(){
          }))
         .on('error', gutil.log)
         .pipe(gulp.dest('builds/development/css'))
+        .pipe(connect.reload())
 });
 
 gulp.task('watch', function(){
@@ -55,4 +58,11 @@ gulp.task('watch', function(){
     gulp.watch('components/sass/*.scss', ['sass']);
 });
 
-gulp.task('default', ['log', 'coffee', 'js', 'sass', 'watch']);
+gulp.task('connect', function(){
+    connect.server({
+        root : 'builds/development/',
+        livereload : true
+    })
+});
+
+gulp.task('default', ['log', 'coffee', 'js', 'sass', 'connect', 'watch']);
