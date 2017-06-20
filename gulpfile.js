@@ -48,4 +48,11 @@ gulp.task('sass', function(){
         .on('error', gutil.log)
         .pipe(gulp.dest('builds/development/css'))
 });
+
+gulp.task('watch', function(){
+    gulp.watch(coffeeSource, ['coffee']);
+    gulp.watch(jsSource, ['js']);
+    gulp.watch('components/sass/*.scss', ['sass']);
+});
+
 gulp.task('all', ['log', 'coffee', 'js', 'sass']);
