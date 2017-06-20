@@ -55,4 +55,4 @@ gulp.task('watch', function(){
     gulp.watch('components/sass/*.scss', ['sass']);
 });
 
-gulp.task('all', ['log', 'coffee', 'js', 'sass']);
+gulp.task('default', ['log', 'coffee', 'js', 'sass', 'watch']);
