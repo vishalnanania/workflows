@@ -5,6 +5,9 @@ var gulp = require('gulp'),
     browserify = require('gulp-browserify'),
     compass = require('gulp-compass'),
     sass = require('gulp-sass'),
+    gulpif = require('gulp-if'),
+    minifyHTML = require('gulp-minify-html'),
+    uglify = require('gulp-uglify'),
     connect = require('gulp-connect');
 
 var env,
@@ -29,7 +32,7 @@ if(env === 'development'){
 coffeeSource = ['components/coffee/*.coffee'];
 jsSource = ['components/scripts/*.js'];
 sassSource = ['components/sass/style.scss'];
-htmlSource = [outputDir + '*.html'];
+htmlSource = ['builds/development/*.html'];
 jsonSource = [outputDir + 'js/*.json'];
 
 gulp.task('log', function(){
@@ -48,6 +51,7 @@ gulp.task('js', function(){
         .pipe(concat('script.js'))
         .on('error', gutil.log)
         .pipe(browserify())
+        .pipe(gulpif(env === 'production', uglify()))
         .pipe(gulp.dest(outputDir + 'js'))
         .pipe(connect.reload())
 });
@@ -75,6 +79,8 @@ gulp.task('sass', function(){
 
 gulp.task('html', function(){
     gulp.src(htmlSource)
+        .pipe(gulpif(env === 'production', minifyHTML()))
+        .pipe(gulpif(env === 'production', gulp.dest(outputDir)))
         .pipe(connect.reload())
 });
 
