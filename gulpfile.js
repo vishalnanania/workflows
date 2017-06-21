@@ -9,6 +9,8 @@ var gulp = require('gulp'),
     minifyHTML = require('gulp-minify-html'),
     uglify = require('gulp-uglify'),
     jsonminify = require('gulp-jsonminify'),
+    imagemin = require('gulp-imagemin'),
+    pngcrush = require('imagemin-pngcrush'),
     connect = require('gulp-connect');
 
 var env,
@@ -17,6 +19,7 @@ var env,
     sassSource,
     htmlSource,
     jsonSource,
+    imageSource,
     outputDir,
     sassStyle;
 
@@ -35,6 +38,7 @@ jsSource = ['components/scripts/*.js'];
 sassSource = ['components/sass/style.scss'];
 htmlSource = ['builds/development/*.html'];
 jsonSource = ['builds/development/js/*.json'];
+imageSource = ['builds/development/images/**/*.*'];
 
 gulp.task('log', function(){
     gutil.log('workflows are awesome');
@@ -92,12 +96,24 @@ gulp.task('json', function(){
         .pipe(connect.reload())
 });
 
+gulp.task('images', function(){
+    gulp.src(imageSource)
+        .pipe(gulpif(env === 'production', imagemin({
+            progressive: true,
+            svgoPlugins: [{ removeVIewBox: false }],
+            use: [pngcrush()]
+        })))
+        .pipe(gulpif(env === 'production', gulp.dest(outputDir+'images')))
+        .pipe(connect.reload())
+});
+
 gulp.task('watch', function(){
     gulp.watch(coffeeSource, ['coffee']);
     gulp.watch(jsSource, ['js']);
     gulp.watch('components/sass/*.scss', ['sass']);
     gulp.watch(htmlSource, ['html']);
     gulp.watch(jsonSource, ['json']);
+    gulp.watch(imageSource, ['images']);
 });
 
 gulp.task('connect', function(){
@@ -107,4 +123,4 @@ gulp.task('connect', function(){
     })
 });
 
-gulp.task('default', ['log', 'html', 'json', 'coffee', 'js', 'sass', 'connect', 'watch']);
+gulp.task('default', ['log', 'html', 'json', 'coffee', 'js', 'sass', 'images', 'connect', 'watch']);
